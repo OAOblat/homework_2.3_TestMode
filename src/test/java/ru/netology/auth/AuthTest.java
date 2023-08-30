@@ -1,37 +1,40 @@
 package ru.netology.auth;
 
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.filter.log.LogDetail;
-import io.restassured.http.ContentType;
-import io.restassured.specification.RequestSpecification;
-import org.junit.jupiter.api.BeforeAll;
+import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.SelenideElement;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static io.restassured.RestAssured.given;
+import java.time.Duration;
+
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.open;
+import static ru.netology.auth.UserGenerator.generateRandomUserActive;
 
 
-// спецификация нужна для того, чтобы переиспользовать настройки в разных запросах
 class AuthTest {
-    private static RequestSpecification requestSpec = new RequestSpecBuilder()
-            .setBaseUri("http://localhost")
-            .setPort(9999)
-            .setAccept(ContentType.JSON)
-            .setContentType(ContentType.JSON)
-            .log(LogDetail.ALL)
-            .build();
 
-
+    @BeforeEach
+    void setup() {
+        open("http://localhost:9999");
+    }
     @Test
-    void setUpAll() {
+    void should200() {
+            // Генерируем случайного пользователя и сохраняем значения в переменной userData
+            String userData = generateRandomUserActive();
 
-        // сам запрос
-        given() // "дано"
-                .spec(requestSpec) // указываем, какую спецификацию используем
-                .body(new RegistrationDto("vasya", "password", "active")) // передаём в теле объект, который будет преобразован в JSON
-                .when() // "когда"
-                .post("/api/system/users") // на какой путь относительно BaseUri отправляем запрос
-                .then() // "тогда ожидаем"
-                .statusCode(200); // код 200 OK
+            // Разделяем значения имени пользователя и пароля
+            String[] userValues = userData.split(":");
+            String savedUsername = userValues[0];
+            String savedPassword = userValues[1];
+
+            SelenideElement form = $(".App_appContainer__3jRx1");
+        form.$("[data-test-id=login] input").sendKeys(savedUsername);
+        form.$("[data-test-id=password] input").sendKeys(savedPassword);
+        form.$("[data-test-id=action-login]").click();
+        $(".icon_name_bank-2449")
+                .shouldHave(Condition.text("Личный кабинет"), Duration.ofSeconds(15))
+                .shouldBe(Condition.visible);
     }
 
 
