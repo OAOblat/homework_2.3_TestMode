@@ -5,7 +5,7 @@ import com.github.javafaker.Faker;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
+import  io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 import static io.restassured.RestAssured.given;
@@ -36,8 +36,10 @@ public class UserGenerator {
                     .post("/api/system/users")
                     .then()
                     .statusCode(200)
+                    .log().all() // строчка для логирования ответа
                     .extract()
                     .response();
+
 
             // Извлекаем значения пользователя из ответа
             String savedUsername = response.jsonPath().getString("username");

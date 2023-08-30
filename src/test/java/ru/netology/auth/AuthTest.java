@@ -28,11 +28,11 @@ class AuthTest {
             String savedUsername = userValues[0];
             String savedPassword = userValues[1];
 
-            SelenideElement form = $(".App_appContainer__3jRx1");
+            SelenideElement form = $(".form_theme_alfa-on-white");
         form.$("[data-test-id=login] input").sendKeys(savedUsername);
         form.$("[data-test-id=password] input").sendKeys(savedPassword);
         form.$("[data-test-id=action-login]").click();
-        $(".icon_name_bank-2449")
+        $(".heading_theme_alfa-on-white")
                 .shouldHave(Condition.text("Личный кабинет"), Duration.ofSeconds(15))
                 .shouldBe(Condition.visible);
     }
